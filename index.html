@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Video Game Gif Grabber</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+
+<body>
+	<form id="game-form">
+		<label for="movie-input">What Game do you Want to GIF?</label>
+		<input type="text" id="game-input">
+		<br>
+		<!-- Button triggers new movie to be added -->
+		<input id="add-game" type="submit" value="Get Game GIFs">
+	</form>
+	<div id="button-container"></div>
+	<div id="gif-container"></div>
+	<script type="text/javascript">
+    /*
+        GLOBAL VARIABLES
+        ==============================*/
+        var games = ["zelda", "megaman", "mario party", "final fantasy", "donkey kong", "metroid", "overwatch", "resident evil", "splatoon", "street fighter"];
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q="
+        var apiKey = "&api_key=KnGf9wGYEYRhvRQJ2r2Z8GXWWHnYejEK&limit=10"
+
+
+
+    /*
+    API CALL
+    ==============================*/
+
+    function getGame() {
+    	var game = $(this).attr("data-name");
+    	var searchURL = queryURL + game + apiKey;
+
+    	$.ajax({
+    		url: searchURL,
+    		method: "GET"
+    	}).done(function(response) {
+    		console.log(response);
+
+            //Storing the data from the AJAX call in an easy to reference variable
+            var results = response.data;
+
+
+            //Looping through each returned object
+            for (j = 0; j < results.length; j++) {
+
+                //creating a div to store the gif and rating in
+                var gifDiv = $("<div>");
+
+                //Creating an img and p tag to store the gifs and ratings in
+                var displayGif = $("<img>");
+                var displayRating = $("<p>").text("Rating: " + results[j].rating);
+
+                //Adding still and animate data attributes to the displayGif var
+                displayGif.attr("data-still", results[j].images.fixed_height_still.url);
+                displayGif.attr("data-animate", results[j].images.fixed_height.url);
+
+                //Setting the displayGif source to the still data type
+                displayGif.attr("src", displayGif.attr("data-still"));
+
+                //On click function that triggers still gifs to animate and vice-versa
+                displayGif.on("click", function() {
+                	if ($(this).attr("src") === $(this).attr("data-still")) {
+                		$(this).attr("src", $(this).attr("data-animate"));
+                	} else {
+                		$(this).attr("src", $(this).attr("data-still"));
+                	}
+                });
+
+                //Add Class
+                displayGif.addClass("gif");
+
+                //Appending the img and rating to the gifDiv
+                gifDiv.append(displayRating);
+                gifDiv.append(displayGif);
+
+                //Prepending the gifDiv to the HTML
+                $("#gif-container").prepend(gifDiv);
+              }
+            })
+    }
+
+    /*
+    FUNCTION OT RENDER BUTTONS
+    ==============================*/
+
+    function renderButtons() {
+
+    	$("#button-container").empty();
+
+    	for (i = 0; i < games.length; i++) {
+    		var newButton = $("<button>");
+    		newButton.addClass("game-buttons");
+    		newButton.attr("data-name", games[i]);
+    		newButton.text(games[i]);
+
+    		$("#button-container").append(newButton);
+
+    	}
+    }
+
+    /*
+    MAIN PROCESS FUNCTION
+    ==============================*/
+
+
+    $(document).on("click", ".game-buttons", getGame);
+
+
+    //On Click Event for adding new buttons
+    $("#add-game").on("click", function(event) {
+        //Keeps page from refreshing whe form is submitted
+        event.preventDefault();
+
+        //Takes user input and assigns it to the game variable
+        var game = $("#game-input").val().trim();
+
+        //Adds the new game variable to the games array
+        games.push(game);
+        //Logs the game array whenever a new item is added
+        console.log(games);
+
+        //Renders a button for the new game variable
+        renderButtons();
+      });
+
+
+    renderButtons();
+  </script>
+</body>
+
+</html>
