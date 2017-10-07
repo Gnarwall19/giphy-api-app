@@ -1,0 +1,25 @@
+#container {
+	margin: 15px;
+}
+
+#add-game {
+	background: #fc0c0c;
+}
+
+button {
+	margin: 5px;
+	background: #3ab5fc;
+}
+
+form {
+	display: inline-block;
+	float: right;
+	position: relative;
+}
+
+#game-input {
+	border: solid 2px red;
+}
+body {
+	background: #ffff00;
+}
